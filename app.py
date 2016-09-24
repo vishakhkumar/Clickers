@@ -1,6 +1,4 @@
-
-
-from flask import Flask,request
+from flask import Flask,request,jsonify
 from flask_json import FlaskJSON, JsonError, json_response, as_json
 
 #implementation of answer responses via JSON queries
@@ -33,28 +31,27 @@ class answerresponse(object):
 
 app = Flask(__name__)
 
+
+@app.route('/api/answer/<uuid>', methods=['GET', 'POST'])
+def answer(uuid):
+    content = request.json
+    
+    student = answerresponse(studentID =  content['studentID'],answer = content['answer'])
+    return jsonify({"message":student.grade()})
+    
+
+@app.route('/api/add_message/<uuid>', methods=['GET', 'POST'])
+def add_message(uuid):
+    content = request.json
+    print content['mytext']
+    return jsonify({"uuid":uuid})
+
 @app.route('/')
 def sup():
   return "Sup, world!"
 
-@app.route('/test',methods=['GET'])
-def route():
-  print 'test'
-  return json_response(message="Hello!")
-
-@app.route('/answer',methods=['POST'])
-def answer():
-  print 'test'
-  data = request.get_json(force=True)
-#  studentanswer = answerresponse()
-#  if studentanswer.fromJSON(data)=="Correct":
-#    return json_response(message="Thank you")
-#  else:
-#    raise JsonError(description='Invalid value.')
-#  print(data['studentID'])
-  print(console.log())
-  return json_response(message="Thank you")
-
+if __name__ == '__main__':
+    app.run(host= '0.0.0.0',debug=True)
 
 
 
