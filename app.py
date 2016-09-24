@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 #implementation of answer responses via JSON queries
 
 class answerresponse(object):
-  def __init__(self, studentID: object = None, answer: object = None) -> object:
+  def __init__(self, studentID = None, answer= None):
     # ask for forgiveness
     try: self.studentID 
     except AttributeError:
