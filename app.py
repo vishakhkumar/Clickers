@@ -1,6 +1,4 @@
-from flask import Flask,request,jsonify
-from flask_json import FlaskJSON, JsonError, json_response, as_json
-
+from flask import Flask, request, jsonify
 #implementation of answer responses via JSON queries
 
 class answerresponse(object):
