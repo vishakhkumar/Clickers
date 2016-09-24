@@ -75,7 +75,7 @@ def initialise(questionTemplate):
 
     if request.method == 'POST':
         student = Session()
-        student.init(questionTemplate)
+        student.init(questionTemplate['array'])
         db.session.add(student)
         db.session.commit()
         flash('Record was successfully added')
