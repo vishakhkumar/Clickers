@@ -9,8 +9,8 @@ from flask_sqlalchemy import SQLAlchemy
 global db
 
 
-class answerresponse(object):
-    def __init__(self, studentID=None, answer=None):
+class AnswerResponse(object):
+    def __init__(self, studentID, answer):
         # ask for forgiveness
         try:
             self.studentID
@@ -27,10 +27,7 @@ class answerresponse(object):
         self.answer = answer
 
     def grade(self):
-        if self.answer == 'A':
-            return True
-        else:
-            return False
+        return self.answer == 'A'
 
 
 # Professor question template
@@ -58,7 +55,7 @@ def initialise(questionTemplate):
             return 500
 
     def columnname(i):
-        return ("Q" + +str(i + 1))
+        return "Q" + str(i + 1)
 
     class Session(db.Model):
         global db
@@ -85,7 +82,7 @@ def initialise(questionTemplate):
 @app.route('/api/answer/<uuid>', methods=['GET', 'POST'])
 def answer(uuid):
     content = request.json
-    studentResp = answerresponse(studentID=content['studentID'], answer=content['answer'])
+    studentResp = AnswerResponse(studentID=content['studentID'], answer=content['answer'])
 
     student = db.query.filter_by(student_id=studentResp.studentID).first()
     student.question = answer
