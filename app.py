@@ -63,15 +63,19 @@ def initialise(questionTemplate):
         id = db.Column('student_id', db.Integer, primary_key=True)
 
     def __init__(self, types):
+        print("Database initialised")
+
+    def init(self,types):
         for i in types:
             # serialize the name coming from columnname(i)
-            exec(columnname(i) + " = db.column(db.String(" + characterLength(types[i]) + " )) ")
+            eval(columnname(i) + " = db.column(db.String(" + characterLength(types[i]) + " )) ")
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///session.sqlite3'
     db = SQLAlchemy(app)
 
     if request.method == 'POST':
-        student = Session(questionTemplate)
+        student = Session()
+        student.init(questionTemplate)
         db.session.add(student)
         db.session.commit()
         flash('Record was successfully added')
