@@ -1,4 +1,3 @@
-from __future__ import *
 from flask import Flask, request, jsonify
 #implementation of answer responses via JSON queries
 
