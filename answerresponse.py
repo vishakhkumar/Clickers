@@ -21,7 +21,7 @@ class answerresponse(object):
     self.answer = answer
 
  
-  def toJson(self): 
+  def toJSON(self): 
     return json_response(studentID = self.studentID,answer=self.answer)
 #    return {"StudentID": self.studentID,
 #            "Answer"   :self.answer}
