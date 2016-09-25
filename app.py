@@ -9,7 +9,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 if __name__ == '__main__':
     app.run()
-    db = None
 
 class AnswerResponse(object):
     def __init__(self, studentID, answer):
@@ -24,6 +23,7 @@ types = ["option", "numerical", "string", "option", "numerical"]
 
 app = Flask(__name__)
 
+"""
 @app.route('/initialize/<uuid>', methods=['GET', 'POST'])
 def initialize(uuid):
 
@@ -71,17 +71,17 @@ def initialize(uuid):
     flash('Record was successfully added')
 
     return redirect(url_for('show_all'))
-
+"""
 
 @app.route('/api/answer/<uuid>', methods=['GET', 'POST'])
 def answer(uuid):
     content = request.json
     studentResp = AnswerResponse(studentID=content['studentID'], answer=content['answer'])
-
+"""
     student = db.query.filter_by(student_id=studentResp.studentID).first()
     student.question = answer
     db.session.commit()
-
+"""
     return jsonify({"msg": "Transmission successful"})
 
 @app.route('/peekaboo/<uuid>')
@@ -89,7 +89,9 @@ def peekaboo(uuid):
     content = request.json
     print("Hello!")
     if content['test']!=0:
-        return jsonify({"msg":"Transmission successful"})
+      print("sucess!") 
+
+    return jsonify({"msg":"Transmission successful"})
 
 
 @app.route('/')
