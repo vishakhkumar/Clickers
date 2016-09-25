@@ -74,14 +74,13 @@ def initialise(questionTemplate):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///session.sqlite3'
     db = SQLAlchemy(app)
 
-    if request.method == 'POST':
-        student = Session()
-        student.init(questionTemplate['array'])
-        db.session.add(student)
-        db.session.commit()
-        flash('Record was successfully added')
+    student = Session()
+    student.init(questionTemplate['array'])
+    db.session.add(student)
+    db.session.commit()
+    flash('Record was successfully added')
 
-        return redirect(url_for('show_all'))
+    return redirect(url_for('show_all'))
 
 
 @app.route('/api/answer/<uuid>', methods=['GET', 'POST'])
