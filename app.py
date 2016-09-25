@@ -6,38 +6,28 @@ from flask_sqlalchemy import SQLAlchemy
 
 # implementation of answer responses via JSON queries
 
-global db
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True)
+    db = None
 
 class AnswerResponse(object):
     def __init__(self, studentID, answer):
-        # ask for forgiveness
-        try:
-            self.studentID
-        except AttributeError:
-            self.studentID = None
-        try:
-            self.answer
-        except AttributeError:
-            self.answer = None
-        # assign values, even if they don't exist.
-
         self.type = "Answer"
         self.studentID = studentID
         self.answer = answer
-
     def grade(self):
         return self.answer == 'A'
-
 
 # Professor question template
 types = ["option", "numerical", "string", "option", "numerical"]
 
 app = Flask(__name__)
 
+@app.route('/initialize/<uuid>', methods=['GET', 'POST'])
+def initialize(uuid):
 
-@app.route('/initialize/<QuestionTemplate>')
-def initialize(questionTemplate):
+    print("Sup!")
     questionTemplate = request.json
     # Sql constants
     option = 5
@@ -94,12 +84,14 @@ def answer(uuid):
 
     return jsonify({"msg": "Transmission successful"})
 
-
+@app.route('/peekabo/<uuid>')
+def peekaboo(uuid):
+    content = request.json
+    if content['test']!=0:
+        return jsonify({"msg":"Transmission successful"})
 @app.route('/')
 def sup():
     return "Sup, world!"
 
 
-if __name__ == '__main__':
-    db.create_all()
-    app.run(host='0.0.0.0', debug=True)
+
