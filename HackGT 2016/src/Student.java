@@ -15,13 +15,14 @@ public class Student extends User {
         this.currentClass = null;
     }
 
-    public void joinClass(final Classroom room) {
+    public void joinClass(Classroom room) {
         this.currentClass = room;
         Thread newT = new Thread() {
+            Classroom room2 = Student.this.currentClass;
             public void run() {
                 ArrayList<String> nearbyIds = Student.this.getNearbyIds();
-                while (!room.classAuthenticated()) {
-                    room.attemptJoin(Student.this, nearbyIds);
+                while (!room2.classAuthenticated()) {
+                    room2.attemptJoin(Student.this, nearbyIds);
                 }
             }
         };

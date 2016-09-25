@@ -4,8 +4,6 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
-import org.json.JSONStringer;
-import org.json.JSONWriter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,16 +26,15 @@ public class Server {
     public static void main(String[] args) throws IOException {
         Server s = new Server();
         int i = 0;
-    /*while (true) {
-      System.out.println(s.request(Json.createObjectBuilder().add("Test", i).build()));
-      i++;
-      try {
-        Thread.sleep(1000); // One update per second
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }*/
         System.out.println(s.request(new JSONObject().put("test", i)));
+        while (true) {
+            s.listenForAuth();
+            try {
+                Thread.sleep(4000); // One update per second
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public ArrayList<Classroom> getClasses() {
@@ -64,17 +61,34 @@ public class Server {
         //handle the messages that are recieved
     }
 
-    public void listen() {
-
+    public void listenForAuth() {
+        JSONObject response = this.request(new JSONObject().put("authenticate request?", ""));
+        if (response == null) {
+            return;
+        }
+        else if (response.get("type").equals("professor")) {
+            this.logOnProf((String) response.get("name"), (int) response.get("id"));
+        }
+        this.logOnStudent((String) response.get("name"), (int) response.get("id"));
     }
 
-    public String request(JSONObject j) throws IOException {
+    public JSONObject request(JSONObject j) {
         HttpClient httpclient = HttpClients.createDefault();
         HttpPost httppost = new HttpPost("http://127.0.0.1:5000/");
         StringEntity params = new StringEntity(j.toString(), ContentType.APPLICATION_JSON);
         httppost.setEntity(params);
-        org.apache.http.HttpResponse resp = httpclient.execute(httppost);
-        return resp.toString();
-
+        org.apache.http.HttpResponse resp = null;
+        try {
+            resp = httpclient.execute(httppost);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            return new JSONObject(resp.toString());
+        }
+        catch (org.json.JSONException exp) {
+            System.out.println("failed connection");
+            return null;
+        }
     }
 }
