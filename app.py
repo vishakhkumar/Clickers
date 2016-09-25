@@ -21,11 +21,18 @@ db = SQLAlchemy(app)
 def sup():
     return "Sup, world!"
 
-@app.route('/peekaboo/<uuid>',methods=['GET','POST'])
-def peekaboo(uuid):
+@app.route('/peekaboo',methods=['GET','POST'])
+def peekaboo():
     content = request.get_json()
     print("Hello!")
     print("sucess!") 
+    return jsonify({"msg":"Transmission successful"})
+
+@app.route('/auth',methods=['GET','POST'])
+def peekaboo():
+    content = request.get_json()
+    print("Hello!")
+    print("sucess!")
     return jsonify({"msg":"Transmission successful"})
 
 @app.route('/get_time',methods=['POST'])

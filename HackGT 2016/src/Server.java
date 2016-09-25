@@ -5,7 +5,9 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
@@ -25,8 +27,11 @@ public class Server {
 
     public static void main(String[] args) throws IOException {
         Server s = new Server();
-        int i = 0;
+        int i = 1;
+        System.out.println(new JSONObject().put("test", i));
+        System.out.println(new JSONObject());
         System.out.println(s.request(new JSONObject().put("test", i)));
+        System.out.println(s.request(new JSONObject()));
         while (true) {
             s.listenForAuth();
             try {
@@ -63,7 +68,8 @@ public class Server {
 
     public void listenForAuth() {
         JSONObject response = this.request(new JSONObject().put("authenticate request?", ""));
-        if (response == null) {
+        if (!response.has("type")) {
+            System.out.println("No login requests!");
             return;
         }
         else if (response.get("type").equals("professor")) {
@@ -74,20 +80,30 @@ public class Server {
 
     public JSONObject request(JSONObject j) {
         HttpClient httpclient = HttpClients.createDefault();
-        HttpPost httppost = new HttpPost("http://127.0.0.1:5000/");
+        HttpPost httppost = new HttpPost("http://localhost:5000/peekaboo");
         StringEntity params = new StringEntity(j.toString(), ContentType.APPLICATION_JSON);
         httppost.setEntity(params);
+        httppost.setHeader("Accept", "application/json");
         org.apache.http.HttpResponse resp = null;
+        String responseString = "";
         try {
             resp = httpclient.execute(httppost);
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader((resp.getEntity().getContent())));
+            String output;
+            while ((output = br.readLine()) != null) {
+                responseString += output;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        httpclient.getConnectionManager().shutdown();
         try {
-            return new JSONObject(resp.toString());
+            return new JSONObject(responseString);
         }
         catch (org.json.JSONException exp) {
             System.out.println("failed connection");
+            System.out.println(responseString);
             return null;
         }
     }

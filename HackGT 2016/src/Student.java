@@ -20,7 +20,7 @@ public class Student extends User {
         Thread newT = new Thread() {
             Classroom room2 = Student.this.currentClass;
             public void run() {
-                ArrayList<String> nearbyIds = Student.this.getNearbyIds();
+                ArrayList<Integer> nearbyIds = Student.this.getNearbyIds();
                 while (!room2.classAuthenticated()) {
                     room2.attemptJoin(Student.this, nearbyIds);
                 }
@@ -30,7 +30,7 @@ public class Student extends User {
     }
 
 
-    public ArrayList<String> getNearbyIds() {
+    public ArrayList<Integer> getNearbyIds() {
         return null;
     }
 
