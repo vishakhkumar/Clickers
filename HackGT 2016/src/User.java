@@ -32,11 +32,7 @@ public abstract class User {
         b.put("type", "authenticate");
         b.put("id", this.id);
         b.put("name", this.name);
-        try {
-            host.request(b);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        host.request(b);
     }
 
 

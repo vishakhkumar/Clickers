@@ -1,3 +1,4 @@
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONStringer;
 
@@ -13,8 +14,8 @@ public class Classroom {
     private Server host;
     private Professor prof;
     private String name;
-    private ArrayList<String> classmateIds;
-    private ArrayList<String> currentIds;
+    private ArrayList<Integer> classmateIds;
+    private ArrayList<Integer> currentIds;
     private ArrayList<Student> classmates;
     private HashMap<JSONObject, HashMap<Integer, JSONObject>> questions;
     private double attendanceTolerance;
@@ -24,34 +25,48 @@ public class Classroom {
         this.prof = prof;
         this.host = host;
         this.classmateIds = this.getClassList();
-        this.currentIds = new ArrayList<String>();
+        this.currentIds = new ArrayList<Integer>();
         this.classmates = new ArrayList<Student>();
         this.questions = new HashMap<JSONObject, HashMap<Integer, JSONObject>>();
     }
 
-    public void attemptJoin(Student s, ArrayList<String> nearbyIds) {
+    public void attemptJoin(Student s, ArrayList<Integer> nearbyIds) {
         if (!classmateIds.contains(s.getId())) {
             throw new IllegalArgumentException("main.Student not in class");
         }
         classmates.add(s);
-        for (String id : nearbyIds) {
+        for (Integer id : nearbyIds) {
             if (!currentIds.contains(id) && classmateIds.contains(id)) {
                 currentIds.add(id);
             }
         }
     }
 
-  /*public JsonObject getRawAnswers(JsonObject question) {
-    //go online
-    JsonObjectBuilder b = Json.createObjectBuilder();
-    JsonObject answers = host.request(question);
-    String rawData = "";
-    for (JsonValue j : answers.values()) {
-      rawData += j.toString() + ", ";
-    }
-    b.add("data", rawData);
-    return b.build();
-  }*/
+  public JSONObject getRawAnswers(String question) {
+    JSONObject response = this.host.request(new JSONObject().put("type", "question").put("content" , question));
+    JSONObject r = new JSONObject();
+      String rawData = "";
+    JSONArray answers = (JSONArray) response.get("answers");
+      for(int i = 0; i < answers.length(); i++) {
+          rawData += answers.getString(i) + " ,";
+      }
+    r.put("data", rawData);
+    return r;
+  }
+
+  public JSONObject getPercentCorrect(String question, String answer) {
+      JSONObject response = this.host.request(new JSONObject().put("type", "question").put("content" , question));
+      JSONObject r = new JSONObject();
+      JSONArray answers = (JSONArray) response.get("answers");
+      int correctAnswers = 0;
+      for(int i = 0; i < answers.length(); i++) {
+          if (answers.getString(i).equals(answer)) {
+              correctAnswers++;
+          }
+      }
+      r.put("data", ((double) correctAnswers)/answers.length());
+      return r;
+  }
 
 
     public boolean equals(String name) {
@@ -67,18 +82,19 @@ public class Classroom {
                 JSONObject b = new JSONObject();
                 b.put("id", s.getId());
                 b.put("random", s.getNewRandomId());
-                try {
-                    host.request(b);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                host.request(b);
             }
         }
         return true;
     }
 
-    public ArrayList<String> getClassList() {
-        return null; //TODO
+    public ArrayList<Integer> getClassList() {
+        ArrayList<Integer> idList = new ArrayList<Integer>();
+        JSONObject list = host.request(new JSONObject().put("type", "classlist").put("name", this.name));
+        for (Object o : list.keySet()) {
+            idList.add((Integer) o);
+        }
+        return idList;
     }
 
 

@@ -18,8 +18,4 @@ public class Professor extends User {
         host.addClass(new Classroom(className, this, host, attendanceTolerance));
     }
 
-    public void authenticate() {
-        //go to the server and make sure my name and id exist in the system
-    }
-
 }
