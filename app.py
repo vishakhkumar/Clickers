@@ -4,8 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 from datetime import datetime
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///session.sqlite3'
-db = SQLAlchemy(app)
 
 
 # Professor question template
@@ -13,6 +11,11 @@ types = ["option", "numerical", "string", "option", "numerical"]
 
 app = Flask(__name__,static_url_path='')
 FlaskJSON(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///session.sqlite3'
+db = SQLAlchemy(app)
+
+
 
 @app.route('/')
 def sup():
