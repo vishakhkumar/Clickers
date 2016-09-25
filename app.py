@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run()
     db = None
 
 class AnswerResponse(object):
@@ -84,11 +84,14 @@ def answer(uuid):
 
     return jsonify({"msg": "Transmission successful"})
 
-@app.route('/peekabo/<uuid>')
+@app.route('/peekaboo/<uuid>')
 def peekaboo(uuid):
     content = request.json
+    print("Hello!")
     if content['test']!=0:
         return jsonify({"msg":"Transmission successful"})
+
+
 @app.route('/')
 def sup():
     return "Sup, world!"
