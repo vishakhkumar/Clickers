@@ -37,7 +37,7 @@ app = Flask(__name__)
 
 
 @app.route('/initialize/<QuestionTemplate>')
-def initialise(questionTemplate):
+def initialize(questionTemplate):
     questionTemplate = request.json
     # Sql constants
     option = 5
