@@ -38,6 +38,7 @@ app = Flask(__name__)
 
 @app.route('/initialize/<QuestionTemplate>')
 def initialise(questionTemplate):
+    questionTemplate = request.json
     # Sql constants
     option = 5
     numerical = 30
