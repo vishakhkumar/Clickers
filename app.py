@@ -1,43 +1,45 @@
 from flask import Flask, request, jsonify
-from flask import flash
-from flask import redirect
-from flask import url_for
+from flask_json import FlaskJSON, JsonError, json_response, as_json
 from flask_sqlalchemy import SQLAlchemy
 
-# implementation of answer responses via JSON queries
+from datetime import datetime
 
-global db
-
-
-class AnswerResponse(object):
-    def __init__(self, studentID, answer):
-        # ask for forgiveness
-        try:
-            self.studentID
-        except AttributeError:
-            self.studentID = None
-        try:
-            self.answer
-        except AttributeError:
-            self.answer = None
-        # assign values, even if they don't exist.
-
-        self.type = "Answer"
-        self.studentID = studentID
-        self.answer = answer
-
-    def grade(self):
-        return self.answer == 'A'
 
 
 # Professor question template
 types = ["option", "numerical", "string", "option", "numerical"]
 
-app = Flask(__name__)
+app = Flask(__name__,static_url_path='')
+FlaskJSON(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///session.sqlite3'
+db = SQLAlchemy(app)
 
 
-@app.route('/initialize/<QuestionTemplate>')
-def initialize(questionTemplate):
+
+@app.route('/')
+def sup():
+    return "Sup, world!"
+
+@app.route('/peekaboo/<uuid>',methods=['GET','POST'])
+def peekaboo(uuid):
+    content = request.get_json()
+    print("Hello!")
+    print("sucess!") 
+    return jsonify({"msg":"Transmission successful"})
+
+@app.route('/get_time',methods=['POST'])
+def get_time():
+    print("poop")
+    now = datetime.utcnow()
+    return jsonify({"time":now})    
+
+
+@app.route('/initialize/<uuid>', methods=['POST'])
+def initialize(uuid):
+    global db
+    
+    print("Sup!")
     questionTemplate = request.json
     # Sql constants
     option = 5
@@ -46,14 +48,10 @@ def initialize(questionTemplate):
     question = 500
 
     def characterLength(a):
-        if a == "option":
-            return 5
-        elif a == "numerical":
-            return 30
-        elif a == "string":
-            return 120
-        elif a == "question":
-            return 500
+        if a == "option":      return 5
+        elif a == "numerical": return 30
+        elif a == "string":    return 120
+        elif a == "question":  return 500
 
     def columnname(i):
         return "Q" + str(i + 1)
@@ -63,16 +61,14 @@ def initialize(questionTemplate):
         # your students id.
         id = db.Column('student_id', db.Integer, primary_key=True)
 
-    def __init__(self, types):
-        print("Database initialised")
+        def __init__(self, types):
+            print("Database initialised")
 
-    def init(self,types):
-        for i in types:
-            # serialize the name coming from columnname(i)
-            eval(columnname(i) + " = db.column(db.String(" + characterLength(types[i]) + " )) ")
+        def init(self,types):
+         for i in types:
+             # serialize the name coming from columnname(i)
+             eval(columnname(i) + " = db.column(db.String(" + characterLength(types[i]) + " )) ")
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///session.sqlite3'
-    db = SQLAlchemy(app)
 
     student = Session()
     student.init(questionTemplate['array'])
@@ -85,21 +81,30 @@ def initialize(questionTemplate):
 
 @app.route('/api/answer/<uuid>', methods=['GET', 'POST'])
 def answer(uuid):
-    content = request.json
+    
+    global db
+
+    content = request.get_json()
+
+    class AnswerResponse(object):
+        def __init__(self, studentID, answer):
+         self.type = "Answer"
+         self.studentID = studentID
+         self.answer = answer
+        def grade(self):
+         return self.answer == 'A'
+
     studentResp = AnswerResponse(studentID=content['studentID'], answer=content['answer'])
 
+    """
     student = db.query.filter_by(student_id=studentResp.studentID).first()
     student.question = answer
     db.session.commit()
-
+    """
     return jsonify({"msg": "Transmission successful"})
 
 
-@app.route('/')
-def sup():
-    return "Sup, world!"
-
-
 if __name__ == '__main__':
-    db.create_all()
-    app.run(host='0.0.0.0', debug=True)
+    app.run(debug=True)
+
+
